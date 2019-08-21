@@ -1,4 +1,4 @@
-module UiFramework.Configuration exposing (AlertConfig, BadgeConfig, BoxShadow, ButtonConfig, Colors, ContainerConfig, DropdownConfig, FontConfig, InputConfig, NavConfig, NavbarConfig, PaginationConfig, TableConfig, ThemeColor, ThemeConfig, bootstrapColors, bootstrapThemeColor, defaultAlertConfig, defaultBadgeConfig, defaultButtonConfig, defaultContainerConfig, defaultDropdownConfig, defaultFontConfig, defaultFontSize, defaultInputConfig, defaultNavConfig, defaultNavbarConfig, defaultPaginationConfig, defaultTableConfig, defaultThemeConfig)
+module UiFramework.Configuration exposing (AlertConfig, BadgeConfig, ButtonConfig, Colors, ContainerConfig, DropdownConfig, FontConfig, InputConfig, NavConfig, NavbarConfig, PaginationConfig, TableConfig, ThemeColor, ThemeConfig, bootstrapColors, bootstrapThemeColor, defaultAlertConfig, defaultBadgeConfig, defaultButtonConfig, defaultContainerConfig, defaultDropdownConfig, defaultFontConfig, defaultFontSize, defaultInputConfig, defaultNavConfig, defaultNavbarConfig, defaultPaginationConfig, defaultTableConfig, defaultThemeConfig)
 
 import Element exposing (Color, DeviceClass(..))
 import Element.Font as Font
@@ -40,11 +40,10 @@ type alias ThemeColor =
     Role -> Color
 
 
-type alias BoxShadow =
-    { offset : ( Float, Float )
-    , size : Float
-    , blur : Float
-    , color : Color
+type alias FontConfig =
+    { typeface : String
+    , typefaceFallback : Font.Font
+    , url : String
     }
 
 
@@ -81,7 +80,6 @@ type alias ButtonConfig =
     , borderColor : ThemeColor
     , borderWidth : Size -> Int
     , borderRadius : Size -> Int
-    , withShadow : Maybe BoxShadow
     }
 
 
@@ -106,12 +104,6 @@ type alias DropdownConfig =
     , borderColor : Color
     , borderWidth : Int
     , borderRadius : Int
-    }
-
-
-type alias FontConfig =
-    { fontFamily : List Font.Font
-    , fontFamilyMonospace : List Font.Font
     }
 
 
@@ -145,7 +137,6 @@ type alias NavbarConfig =
     , togglerPaddingX : Int
     , togglerPaddingY : Int
     , togglerBorderRadius : Int
-    , withShadow : Maybe BoxShadow
     }
 
 
@@ -259,12 +250,9 @@ bootstrapThemeColor colors role =
 
 defaultFontConfig : FontConfig
 defaultFontConfig =
-    { fontFamily =
-        [ Font.typeface "Segoe UI"
-        , Font.sansSerif
-        ]
-    , fontFamilyMonospace =
-        [ Font.monospace ]
+    { typeface = "Noto Sans"
+    , typefaceFallback = Font.sansSerif
+    , url = "https://fonts.googleapis.com/css?family=Noto+Sans"
     }
 
 
@@ -359,7 +347,6 @@ defaultButtonConfig themeColor =
     , borderColor = themeColor
     , borderWidth = defaultBorderWidth
     , borderRadius = defaultBorderRadius
-    , withShadow = Nothing
     }
 
 
@@ -429,7 +416,6 @@ defaultNavbarConfig =
     , togglerPaddingX = 12
     , togglerPaddingY = 4
     , togglerBorderRadius = 4
-    , withShadow = Nothing
     }
 
 

@@ -1,4 +1,4 @@
-module UiFramework.Container exposing (Container(..), Options, UiElement, default, defaultOptions, jumbotron, maxWidth, simple, view, viewAttributes, withChild, withExtraAttributes, withFullWidth)
+module UiFramework.Container exposing (Container(..), Options, UiElement, default, defaultOptions, jumbotron, maxWidth, simple, view, viewAttributes, withChild, withFullWidth)
 
 import Element exposing (Attribute, DeviceClass(..))
 import Element.Background as Background
@@ -118,7 +118,6 @@ viewAttributes context options =
     , Element.width width
     , Element.centerX
     ]
-        ++ options.attributes
 
 
 maxWidth : DeviceClass -> Int
@@ -128,7 +127,7 @@ maxWidth device =
             540
 
         Tablet ->
-            720
+            1140
 
         _ ->
             1140

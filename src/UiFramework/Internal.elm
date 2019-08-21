@@ -1,4 +1,4 @@
-module UiFramework.Internal exposing (UiContextual, WithContext, flatMap, fromElement, node, toElement, uiColumn, uiNone, uiParagraph, uiRow, uiText, uiWrappedRow)
+module UiFramework.Internal exposing (UiContextual, WithContext, flatMap, fromElement, node, toElement, uiColumn, uiImage, uiNone, uiParagraph, uiRow, uiText, uiWrappedRow)
 
 import Element exposing (Attribute, Device, Element)
 import UiFramework.Configuration exposing (ThemeConfig)
@@ -72,6 +72,7 @@ uiRow attrs =
             Element.row attrs
         )
 
+
 uiWrappedRow : List (Attribute msg) -> List (WithContext (UiContextual c) msg) -> WithContext (UiContextual c) msg
 uiWrappedRow attrs =
     node
@@ -94,3 +95,8 @@ uiParagraph attrs =
         (\_ ->
             Element.paragraph attrs
         )
+
+
+uiImage : List (Attribute msg) -> { description : String, src : String } -> WithContext (UiContextual c) msg
+uiImage attrs imgInfo =
+    Leaf <| \_ -> Element.image attrs imgInfo

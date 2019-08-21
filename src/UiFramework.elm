@@ -1,4 +1,4 @@
-module UiFramework exposing (UiContextual, WithContext, flatMap, fromElement, toElement, uiColumn, uiNone, uiParagraph, uiRow, uiText, uiWrappedRow)
+module UiFramework exposing (UiContextual, WithContext, flatMap, fromElement, toElement, uiColumn, uiImage, uiNone, uiParagraph, uiRow, uiText, uiWrappedRow)
 
 import Element exposing (Attribute, Element)
 import UiFramework.Internal as Internal
@@ -43,6 +43,7 @@ uiRow : List (Attribute msg) -> List (WithContext c msg) -> WithContext c msg
 uiRow =
     Internal.uiRow
 
+
 uiWrappedRow : List (Attribute msg) -> List (WithContext c msg) -> WithContext c msg
 uiWrappedRow =
     Internal.uiWrappedRow
@@ -56,3 +57,8 @@ uiColumn =
 uiParagraph : List (Attribute msg) -> List (WithContext context msg) -> WithContext context msg
 uiParagraph =
     Internal.uiParagraph
+
+
+uiImage : List (Attribute msg) -> { description : String, src : String } -> WithContext c msg
+uiImage =
+    Internal.uiImage

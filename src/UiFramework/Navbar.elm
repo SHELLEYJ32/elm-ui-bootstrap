@@ -2,6 +2,7 @@ module UiFramework.Navbar exposing
     ( MenuItem(..)
     , Navbar
     , NavbarState
+    , customItem
     , default
     , linkItem
     , view
@@ -91,7 +92,7 @@ type BackgroundColor
 type MenuItem context state msg
     = LinkItem (LinkItemOptions msg)
     | DropdownItem (Dropdown.Dropdown context state msg)
-    | CustomItem
+    | CustomItem String
 
 
 type alias LinkItemOptions msg =
@@ -146,6 +147,11 @@ linkItem msg =
         }
 
 
+customItem : String -> MenuItem context state msg
+customItem title =
+    CustomItem title
+
+
 withMenuIcon : Icon.Icon -> MenuItem context state msg -> MenuItem context state msg
 withMenuIcon icon item =
     case item of
@@ -157,7 +163,7 @@ withMenuIcon icon item =
                 |> Dropdown.withIcon icon
                 |> DropdownItem
 
-        CustomItem ->
+        CustomItem title ->
             item
 
 
@@ -172,8 +178,8 @@ withMenuTitle title item =
                 |> Dropdown.withTitle title
                 |> DropdownItem
 
-        CustomItem ->
-            item
+        CustomItem _ ->
+            CustomItem title
 
 
 
@@ -204,17 +210,6 @@ view { toggleMenuState, dropdownState } (Navbar options) =
                     , paddingXY navbarConfig.paddingX navbarConfig.paddingY
                     , Background.color backgroundColor
                     , Font.color fontColor
-                    , Border.shadow <|
-                        case navbarConfig.withShadow of
-                            Nothing ->
-                                { offset = ( 0, 0 )
-                                , size = 0
-                                , blur = 0
-                                , color = Element.rgba 0 0 0 1
-                                }
-
-                            Just shadow ->
-                                shadow
                     ]
 
                 brand attrs =
@@ -239,13 +234,13 @@ view { toggleMenuState, dropdownState } (Navbar options) =
                                 ]
                             <|
                                 column
-                                    [ spacing 6, padding 6 ]
+                                    [ spacing 4, padding 5 ]
                                     [ iconBar, iconBar, iconBar ]
                         )
 
                 iconBar =
                     el
-                        [ width <| px 24
+                        [ width <| px 20
                         , height <| px 2
                         , Background.color fontColor
                         , Border.rounded 1
@@ -267,7 +262,7 @@ view { toggleMenuState, dropdownState } (Navbar options) =
                            )
 
             else
-                Internal.uiRow headerAttrs [ brand [ alignLeft ], viewMenubarList dropdownState options.items ]
+                Internal.uiRow headerAttrs [ viewMenubarList dropdownState options.items, brand [ alignRight ] ]
         )
 
 
@@ -297,6 +292,8 @@ viewCollapsedMenuList dropdownState items =
                 , width fill
                 , alignLeft
                 , Font.alignLeft
+                , paddingXY 0 10
+                , spacing 5
                 ]
             <|
                 List.map (viewMenuItem dropdownState >> Internal.toElement context) items
@@ -309,7 +306,7 @@ viewMenubarList dropdownState items =
         (\context ->
             row
                 [ Region.navigation
-                , alignRight
+                , alignLeft
                 , Font.center
                 ]
             <|
@@ -326,8 +323,8 @@ viewMenuItem dropdownState item =
         DropdownItem dropdown ->
             Dropdown.view dropdownState dropdown
 
-        CustomItem ->
-            Internal.uiNone
+        CustomItem title ->
+            Internal.uiText (\context -> title)
 
 
 viewLinkItem : LinkItemOptions msg -> UiElement context msg

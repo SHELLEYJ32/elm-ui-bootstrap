@@ -1,6 +1,5 @@
 module Themes.Darkly exposing (darklyThemeConfig)
 
-import Element.Font as Font
 import UiFramework.ColorUtils exposing (alterColor, contrastTextColor, darken, hexToColor, lighten, transparent)
 import UiFramework.Configuration
     exposing
@@ -8,7 +7,6 @@ import UiFramework.Configuration
         , Colors
         , ContainerConfig
         , DropdownConfig
-        , FontConfig
         , InputConfig
         , PaginationConfig
         , TableConfig
@@ -34,24 +32,24 @@ import UiFramework.Types exposing (Role(..), Size(..))
 darklyColors : Colors
 darklyColors =
     { white = hexToColor "#fff"
-    , gray = hexToColor "#6c757d"
+    , gray = hexToColor "#A9B0BD" --textgray
     , gray100 = hexToColor "#f8f9fa"
     , gray200 = hexToColor "#ebebeb"
     , gray300 = hexToColor "#dee2e6"
     , gray400 = hexToColor "#ced4da"
     , gray500 = hexToColor "#adb5bd"
-    , gray600 = hexToColor "#999"
-    , gray700 = hexToColor "#444"
-    , gray800 = hexToColor "#303030"
-    , gray900 = hexToColor "#222"
+    , gray600 = hexToColor "#2C2F36" --transitionLightGray
+    , gray700 = hexToColor "#25282E" --transitionDarkgray
+    , gray800 = hexToColor "#21252B" --navbarBlack
+    , gray900 = hexToColor "#282C34" --backgroundBlack
     , black = hexToColor "#000"
-    , blue = hexToColor "#375a7f"
+    , blue = hexToColor "#61AEEE" -- textBlue
     , indigo = hexToColor "#6610f2"
     , purple = hexToColor "#6f42c1"
     , pink = hexToColor "#e83e8c"
-    , red = hexToColor "#E74C3C"
+    , red = hexToColor "#E06C75" --textRed
     , orange = hexToColor "#fd7e14"
-    , yellow = hexToColor "#F39C12"
+    , yellow = hexToColor "#C89463" --textYellow
     , green = hexToColor "#00bc8c"
     , teal = hexToColor "#20c997"
     , cyan = hexToColor "#3498DB"
@@ -106,27 +104,17 @@ darklyAlertConfig themeColor =
 darklyContainerConfig : ContainerConfig
 darklyContainerConfig =
     { defaultContainerConfig
-        | backgroundColor = darklyColors.gray900
-        , jumbotronBackgroundColor = darklyColors.gray800
+        | backgroundColor = darklyColors.gray600
+        , jumbotronBackgroundColor = darklyColors.gray400
     }
 
 
 darklyDropdownConfig : DropdownConfig
 darklyDropdownConfig =
     { defaultDropdownConfig
-        | backgroundColor = darklyColors.gray900
+        | backgroundColor = darklyColors.gray800
         , fontColor = darklyColors.white
         , borderColor = darklyColors.gray700
-    }
-
-
-darklyFontConfig : FontConfig
-darklyFontConfig =
-    { defaultFontConfig
-        | fontFamily =
-            [ Font.typeface "Lato"
-            , Font.sansSerif
-            ]
     }
 
 
@@ -185,8 +173,8 @@ darklyThemeConfig =
     , themeColor = themeColor
     , bodyBackground = darklyColors.gray900
     , bodyColor = darklyColors.white
-    , fontColor = \bgColor -> contrastTextColor bgColor darklyColors.gray900 darklyColors.white
-    , fontConfig = darklyFontConfig
+    , fontColor = \bgColor -> contrastTextColor bgColor darklyColors.gray900 darklyColors.gray
+    , fontConfig = defaultFontConfig
     , alertConfig = darklyAlertConfig themeColor
     , badgeConfig = defaultBadgeConfig themeColor
     , buttonConfig = defaultButtonConfig themeColor
