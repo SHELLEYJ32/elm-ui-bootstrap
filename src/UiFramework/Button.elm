@@ -172,6 +172,7 @@ viewAttributes context options =
         , Border.color btnColors.hoverBorder
         ]
     ]
+        ++ options.attributes
 
 
 type alias ButtonColorsConfig =
