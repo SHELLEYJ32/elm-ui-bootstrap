@@ -1,4 +1,4 @@
-module UiFramework.Icon exposing (Icon, view, viewLink)
+module UiFramework.Icon exposing (Icon, view, viewWithAttribute)
 
 import Element exposing (Attribute, Element, el, html)
 import FontAwesome.Icon
@@ -14,8 +14,8 @@ view icon =
         |> html
 
 
-viewLink : Icon -> List (Attribute msg) -> Element msg
-viewLink icon attr =
+viewWithAttribute : List (Attribute msg) -> Icon -> Element msg
+viewWithAttribute attr icon =
     FontAwesome.Icon.viewIcon icon
         |> html
         |> el attr
