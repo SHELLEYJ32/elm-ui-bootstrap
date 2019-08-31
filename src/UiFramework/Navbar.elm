@@ -12,7 +12,7 @@ module UiFramework.Navbar exposing
     , withExtraAttrs
     , withMenuIcon
     , withMenuItems
-    , withMenuTitle
+    , withMenuTitleorText
     )
 
 import Element
@@ -94,7 +94,7 @@ type BackgroundColor
 type MenuItem context state msg
     = LinkItem (LinkItemOptions msg)
     | DropdownItem (Dropdown.Dropdown context state msg)
-    | CustomItem (CustomItemOptions msg)
+    | CustomItem (CustomItemOptions context msg)
 
 
 type alias LinkItemOptions msg =
@@ -104,10 +104,10 @@ type alias LinkItemOptions msg =
     }
 
 
-type alias CustomItemOptions msg =
+type alias CustomItemOptions context msg =
     { triggerMsg : msg
     , icon : Maybe Icon.Icon
-    , title : Maybe String
+    , text : Maybe (UiElement context msg)
     }
 
 
@@ -161,7 +161,7 @@ customItem msg =
     CustomItem
         { triggerMsg = msg
         , icon = Nothing
-        , title = Nothing
+        , text = Nothing
         }
 
 
@@ -180,8 +180,8 @@ withMenuIcon icon item =
             CustomItem { options | icon = Just icon }
 
 
-withMenuTitle : String -> MenuItem context state msg -> MenuItem context state msg
-withMenuTitle title item =
+withMenuTitleorText : String -> UiElement context msg -> MenuItem context state msg -> MenuItem context state msg
+withMenuTitleorText title text item =
     case item of
         LinkItem options ->
             LinkItem { options | title = title }
@@ -192,7 +192,7 @@ withMenuTitle title item =
                 |> DropdownItem
 
         CustomItem options ->
-            CustomItem { options | title = Just title }
+            CustomItem { options | text = Just text }
 
 
 
@@ -330,8 +330,10 @@ viewMenubarList dropdownState items =
         (\context ->
             row
                 [ Region.navigation
+                , width fill
                 , alignLeft
-                , Font.center
+
+                -- , Font.center
                 ]
             <|
                 List.map (viewMenuItem dropdownState >> Internal.toElement context) items
@@ -373,11 +375,11 @@ viewLinkItem options =
         )
 
 
-viewCustomItem : CustomItemOptions msg -> UiElement context msg
+viewCustomItem : CustomItemOptions context msg -> UiElement context msg
 viewCustomItem options =
-    Internal.fromElement
+    Internal.flatMap
         (\context ->
-            el
+            Internal.uiRow
                 [ onClick options.triggerMsg
                 , paddingXY
                     context.themeConfig.navConfig.linkPaddingX
@@ -385,23 +387,19 @@ viewCustomItem options =
                 , width fill
                 , pointer
                 ]
-                (case options.icon of
+                [ case options.icon of
                     Nothing ->
-                        case options.title of
-                            Nothing ->
-                                Element.none
-
-                            Just title ->
-                                text title
+                        Internal.uiNone
 
                     Just icon ->
-                        case options.title of
-                            Nothing ->
-                                Icon.view icon
+                        Internal.fromElement (\_ -> Icon.view icon)
+                , case options.text of
+                    Nothing ->
+                        Internal.uiNone
 
-                            Just title ->
-                                row [ spacing 5 ] [ el [] <| Icon.view icon, el [] (text title) ]
-                )
+                    Just title ->
+                        title
+                ]
         )
 
 
