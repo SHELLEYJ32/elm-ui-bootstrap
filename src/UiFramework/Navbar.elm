@@ -23,6 +23,7 @@ import Element
         , DeviceClass(..)
         , Element
         , Orientation(..)
+        , alignBottom
         , alignLeft
         , alignRight
         , column
@@ -35,6 +36,7 @@ import Element
         , paddingXY
         , pointer
         , px
+        , rgba255
         , row
         , spacing
         , text
@@ -92,13 +94,20 @@ type BackgroundColor
 type MenuItem context state msg
     = LinkItem (LinkItemOptions msg)
     | DropdownItem (Dropdown.Dropdown context state msg)
-    | CustomItem String
+    | CustomItem (CustomItemOptions msg)
 
 
 type alias LinkItemOptions msg =
     { triggerMsg : msg
     , icon : Maybe Icon.Icon
     , title : String
+    }
+
+
+type alias CustomItemOptions msg =
+    { triggerMsg : msg
+    , icon : Maybe Icon.Icon
+    , title : Maybe String
     }
 
 
@@ -147,9 +156,13 @@ linkItem msg =
         }
 
 
-customItem : String -> MenuItem context state msg
-customItem title =
-    CustomItem title
+customItem : msg -> MenuItem context state msg
+customItem msg =
+    CustomItem
+        { triggerMsg = msg
+        , icon = Nothing
+        , title = Nothing
+        }
 
 
 withMenuIcon : Icon.Icon -> MenuItem context state msg -> MenuItem context state msg
@@ -163,8 +176,8 @@ withMenuIcon icon item =
                 |> Dropdown.withIcon icon
                 |> DropdownItem
 
-        CustomItem title ->
-            item
+        CustomItem options ->
+            CustomItem { options | icon = Just icon }
 
 
 withMenuTitle : String -> MenuItem context state msg -> MenuItem context state msg
@@ -178,16 +191,16 @@ withMenuTitle title item =
                 |> Dropdown.withTitle title
                 |> DropdownItem
 
-        CustomItem _ ->
-            CustomItem title
+        CustomItem options ->
+            CustomItem { options | title = Just title }
 
 
 
 -- Render Navbar
 
 
-view : NavbarState state -> Navbar context state msg -> UiElement context msg
-view { toggleMenuState, dropdownState } (Navbar options) =
+view : NavbarState state -> Int -> Navbar context state msg -> UiElement context msg
+view { toggleMenuState, dropdownState } windowHeight (Navbar options) =
     Internal.flatMap
         (\context ->
             let
@@ -211,6 +224,7 @@ view { toggleMenuState, dropdownState } (Navbar options) =
                     , Background.color backgroundColor
                     , Font.color fontColor
                     ]
+                        ++ options.attributes
 
                 brand attrs =
                     Internal.fromElement
@@ -226,9 +240,6 @@ view { toggleMenuState, dropdownState } (Navbar options) =
                                 [ onClick toggleMenuMsg
                                 , alignLeft
                                 , paddingXY navbarConfig.togglerPaddingX navbarConfig.togglerPaddingY
-                                , Border.color fontColor
-                                , Border.solid
-                                , Border.width 1
                                 , Border.rounded navbarConfig.togglerBorderRadius
                                 , pointer
                                 ]
@@ -248,21 +259,29 @@ view { toggleMenuState, dropdownState } (Navbar options) =
                         none
             in
             if collapseNavbar context.device then
-                Internal.uiColumn headerAttrs <|
+                Internal.uiColumn
+                    (if toggleMenuState then
+                        Element.below
+                            (viewCollapsedMenuList dropdownState options.items headerAttrs windowHeight
+                                |> Internal.toElement context
+                            )
+                            :: headerAttrs
+
+                     else
+                        headerAttrs
+                    )
+                <|
                     [ Internal.uiRow [ width fill ]
                         [ navButton options.toggleMenuMsg
                         , brand [ alignRight ]
                         ]
                     ]
-                        ++ (if toggleMenuState then
-                                [ viewCollapsedMenuList dropdownState options.items ]
-
-                            else
-                                []
-                           )
 
             else
-                Internal.uiRow headerAttrs [ viewMenubarList dropdownState options.items, brand [ alignRight ] ]
+                Internal.uiRow headerAttrs
+                    [ viewMenubarList dropdownState options.items
+                    , brand [ alignRight ]
+                    ]
         )
 
 
@@ -273,30 +292,35 @@ collapseNavbar device =
             True
 
         Tablet ->
-            if device.orientation == Portrait then
-                True
+            True
 
-            else
-                False
-
+        -- if device.orientation == Portrait then
+        --     True
+        -- else
+        --     False
         _ ->
             False
 
 
-viewCollapsedMenuList : state -> List (MenuItem context state msg) -> UiElement context msg
-viewCollapsedMenuList dropdownState items =
+viewCollapsedMenuList : state -> List (MenuItem context state msg) -> List (Attribute msg) -> Int -> UiElement context msg
+viewCollapsedMenuList dropdownState items attr windowHeight =
     Internal.fromElement
         (\context ->
             column
-                [ Region.navigation
-                , width fill
-                , alignLeft
-                , Font.alignLeft
-                , paddingXY 0 10
-                , spacing 5
-                ]
-            <|
-                List.map (viewMenuItem dropdownState >> Internal.toElement context) items
+                (attr
+                    ++ [ Region.navigation
+                       , alignLeft
+                       , width (px 180)
+                       , height (px windowHeight)
+                       , paddingXY 10 30
+                       , spacing 20
+                       , Background.color (rgba255 40 44 52 0.8)
+                       ]
+                )
+                (List.map
+                    (viewMenuItem dropdownState >> Internal.toElement context)
+                    items
+                )
         )
 
 
@@ -323,8 +347,8 @@ viewMenuItem dropdownState item =
         DropdownItem dropdown ->
             Dropdown.view dropdownState dropdown
 
-        CustomItem title ->
-            Internal.uiText (\context -> title)
+        CustomItem options ->
+            viewCustomItem options
 
 
 viewLinkItem : LinkItemOptions msg -> UiElement context msg
@@ -345,6 +369,38 @@ viewLinkItem options =
 
                     Just icon ->
                         row [ spacing 5 ] [ el [] <| Icon.view icon, el [] (text options.title) ]
+                )
+        )
+
+
+viewCustomItem : CustomItemOptions msg -> UiElement context msg
+viewCustomItem options =
+    Internal.fromElement
+        (\context ->
+            el
+                [ onClick options.triggerMsg
+                , paddingXY
+                    context.themeConfig.navConfig.linkPaddingX
+                    context.themeConfig.navConfig.linkPaddingY
+                , width fill
+                , pointer
+                ]
+                (case options.icon of
+                    Nothing ->
+                        case options.title of
+                            Nothing ->
+                                Element.none
+
+                            Just title ->
+                                text title
+
+                    Just icon ->
+                        case options.title of
+                            Nothing ->
+                                Icon.view icon
+
+                            Just title ->
+                                row [ spacing 5 ] [ el [] <| Icon.view icon, el [] (text title) ]
                 )
         )
 
