@@ -313,7 +313,7 @@ viewCollapsedMenuList dropdownState items attr windowHeight =
                        , width (px 180)
                        , height (px windowHeight)
                        , paddingXY 10 30
-                       , spacing 20
+                       , spacing (windowHeight // 10)
                        , Background.color (rgba255 40 44 52 0.8)
                        ]
                 )
@@ -332,8 +332,6 @@ viewMenubarList dropdownState items =
                 [ Region.navigation
                 , width fill
                 , alignLeft
-
-                -- , Font.center
                 ]
             <|
                 List.map (viewMenuItem dropdownState >> Internal.toElement context) items
